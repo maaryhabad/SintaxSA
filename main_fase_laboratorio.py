@@ -2,10 +2,11 @@
 import pygame
 import sys
 import random
+import os
 
 
 # --- CLASSES DOS OBJETOS QUE O JOGADOR PODE CONSTRUIR ---
-# (Nenhuma alteração nesta seção, continua a mesma)
+# (Nenhuma alteração nesta seção)
 class RoboAspirador:
     def __init__(self, pos_x, pos_y):
         self.rect = pygame.Rect(pos_x - 25, pos_y - 25, 50, 50)
@@ -35,9 +36,10 @@ class RoboAspirador:
             return "Bateria esgotada."
 
     def desenhar(self, tela):
+        tela.blit(icon_robo, (self.rect.x, self.rect.y))
+        # Indicador de bateria e status
         cor_status = (0, 255, 0) if self.ligado else (200, 0, 0)
-        pygame.draw.rect(tela, self.cor, self.rect, border_radius=25)
-        pygame.draw.circle(tela, cor_status, (self.rect.centerx, self.rect.centery - 15), 5)
+        pygame.draw.circle(tela, cor_status, (self.rect.centerx, self.rect.centery - 15), 7)
         pygame.draw.rect(tela, (50, 50, 50), (self.rect.left, self.rect.bottom + 5, 50, 10))
         pygame.draw.rect(tela, (0, 255, 0), (self.rect.left, self.rect.bottom + 5, self.bateria / 2, 10))
 
@@ -57,8 +59,10 @@ class SmartLamp:
         return "Lâmpada apagada."
 
     def desenhar(self, tela):
-        cor_desenho = self.cor if self.ligado else (50, 50, 0)
-        pygame.draw.circle(tela, cor_desenho, self.rect.center, 25)
+        tela.blit(icon_lamp, (self.rect.x, self.rect.y))
+        # Efeito de brilho se ligada
+        if self.ligado:
+            pygame.draw.circle(tela, (255, 255, 100, 80), self.rect.center, 30, width=0)
 
 
 class SmartSpeaker:
@@ -84,11 +88,10 @@ class SmartSpeaker:
         return "Speaker desligado."
 
     def desenhar(self, tela):
-        pygame.draw.rect(tela, self.cor, self.rect, border_radius=10)
+        tela.blit(icon_speaker, (self.rect.x, self.rect.y))
+        # Efeito de música se tocando
         if self.tocando_musica:
-            y_offset = random.randint(-5, 5)
-            pygame.draw.line(tela, (255, 255, 255), (self.rect.centerx - 10, self.rect.centery + y_offset),
-                             (self.rect.centerx + 10, self.rect.centery - y_offset), 2)
+            pygame.draw.arc(tela, (0, 255, 255), self.rect.inflate(20, 20), 0, 3.14, 3)
 
 
 # --- INICIALIZAÇÃO DO PYGAME ---
@@ -107,6 +110,21 @@ CINZA = (200, 200, 200)
 VERDE = (0, 200, 100)
 AZUL_ATIVO = (0, 150, 255)  # <--- ALTERAÇÃO: Nova cor para feedback visual
 
+# --- CARREGAMENTO DE ASSETS ---
+import os
+
+ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
+icon_dev = pygame.image.load(os.path.join(ASSETS_PATH, "dev_icon.png"))
+icon_robo = pygame.image.load(os.path.join(ASSETS_PATH, "robot_vacuum_icon.png"))
+icon_lamp = pygame.image.load(os.path.join(ASSETS_PATH, "smart_lamp_icon.png"))
+icon_speaker = pygame.image.load(os.path.join(ASSETS_PATH, "smart_speaker_icon.png"))
+
+# Redimensione os ícones para tamanhos apropriados
+icon_dev = pygame.transform.smoothscale(icon_dev, (60, 60))
+icon_robo = pygame.transform.smoothscale(icon_robo, (50, 50))
+icon_lamp = pygame.transform.smoothscale(icon_lamp, (50, 50))
+icon_speaker = pygame.transform.smoothscale(icon_speaker, (50, 50))
+
 # --- CONTROLE DE ESTADO DO JOGO ---
 desafio_atual = 1
 feedback_msg = "Bem-vindo ao Laboratório!"
@@ -119,6 +137,9 @@ nome_classe_input = ""
 
 # Estado da Área de Testes (Sandbox)
 objetos_instanciados = []
+
+# Estado de introdução
+intro = True
 
 # --- DEFINIÇÃO DOS DESAFIOS ---
 # (Nenhuma alteração nesta seção)
@@ -154,8 +175,81 @@ botao_validar_classe = pygame.Rect(50, 500, 280, 50)
 botao_instanciar = pygame.Rect(850, 650, 150, 50)
 botao_ativar_todos = pygame.Rect(1020, 650, 150, 50)
 
+# --- EXPLICAÇÃO SOBRE HERANÇA ---
+explicacao_eletro = [
+    "Antes de criarmos o RoboAspirador, vamos entender o conceito de herança.",
+    "Imagine uma classe mãe chamada 'Eletrodomestico'.",
+    "Ela pode ligar, desligar e conectar na energia.",
+    "RoboAspirador, SmartLamp e SmartSpeaker são eletrodomésticos,",
+    "ou seja, herdam comportamentos básicos dessa classe mãe.",
+    "",
+    "Pressione qualquer tecla para continuar."
+]
+
+# --- SELEÇÃO DE DESENVOLVEDORES ---
+devs_disponiveis = [
+    {"nome": "Ana", "cor": (255, 100, 100)},
+    {"nome": "Bruno", "cor": (100, 255, 100)},
+    {"nome": "Carla", "cor": (100, 100, 255)},
+    {"nome": "Diego", "cor": (255, 200, 50)}
+]
+dev_selecionado = None
+selecionando_dev = True
+
+# --- FUNÇÃO DE SELEÇÃO DE DESENVOLVEDORES ---
+def tela_selecao_dev():
+    tela.fill((230, 230, 255))
+    titulo = fonte_titulo.render("Selecione um(a) dev para o laboratório!", True, (30, 30, 30))
+    tela.blit(titulo, (LARGURA // 2 - titulo.get_width() // 2, 80))
+    x = 200
+    y = 250
+    botoes = []
+    for dev in devs_disponiveis:
+        rect = pygame.Rect(x, y, 200, 100)
+        pygame.draw.rect(tela, dev["cor"], rect, border_radius=15)
+        pygame.draw.rect(tela, PRETO, rect, 2, border_radius=15)
+        # Ícone do dev
+        tela.blit(icon_dev, (rect.x + 10, rect.y + 20))
+        nome = fonte_titulo.render(dev["nome"], True, PRETO)
+        tela.blit(nome, (rect.x + 80, rect.y + 35))
+        botoes.append((rect, dev))
+        x += 250
+    pygame.display.flip()
+    return botoes
+
 # --- LOOP PRINCIPAL ---
 while True:
+    if selecionando_dev:
+        botoes = tela_selecao_dev()
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                for rect, dev in botoes:
+                    if rect.collidepoint(evento.pos):
+                        dev_selecionado = dev
+                        selecionando_dev = False
+        continue
+
+    if intro:
+        tela.fill((245, 245, 245))
+        y = 150
+        titulo = fonte_titulo.render("Herança e Classe Mãe: Eletrodomestico", True, (0, 0, 0))
+        tela.blit(titulo, (LARGURA // 2 - titulo.get_width() // 2, 80))
+        for linha in explicacao_eletro:
+            texto = fonte_texto.render(linha, True, (0, 0, 0))
+            tela.blit(texto, (LARGURA // 2 - texto.get_width() // 2, y))
+            y += 40
+        pygame.display.flip()
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN or evento.type == pygame.MOUSEBUTTONDOWN:
+                intro = False
+        continue
+
     mouse_pos = pygame.mouse.get_pos()
 
     for evento in pygame.event.get():
@@ -256,6 +350,10 @@ while True:
                     nome_classe_input = ""
                     input_box_active = False  # Desativa a caixa ao mudar de fase
 
+        # --- LÓGICA DE EXPLICAÇÃO ---
+        if evento.type == pygame.KEYDOWN and intro:
+            intro = False  # Sai do modo de introdução ao pressionar qualquer tecla
+
     # --- RENDERIZAÇÃO ---
     tela.fill((245, 245, 245))
 
@@ -318,5 +416,18 @@ while True:
     pygame.draw.rect(tela, PRETO, (0, 720, LARGURA, 30))
     feedback_render = fonte_feedback.render(feedback_msg, True, BRANCO)
     tela.blit(feedback_render, (10, 725))
+
+    # --- RENDERIZAÇÃO DA EXPLICAÇÃO ---
+    if intro:
+        y_offset = 0
+        for linha in explicacao_eletro:
+            texto_explicacao = fonte_texto.render(linha, True, PRETO)
+            tela.blit(texto_explicacao, (50, 100 + y_offset))
+            y_offset += 30
+
+    if dev_selecionado:
+        tela.blit(icon_dev, (750, 5))
+        dev_nome = fonte_feedback.render(f"Dev: {dev_selecionado['nome']}", True, dev_selecionado["cor"])
+        tela.blit(dev_nome, (820, 20))
 
     pygame.display.flip()
