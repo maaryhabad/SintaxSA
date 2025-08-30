@@ -3,123 +3,30 @@ import pygame
 import sys
 import random
 import os
-
-# --- CLASSES DOS OBJETOS QUE O JOGADOR PODE CONSTRUIR ---
-class RoboAspirador:
-    def __init__(self, pos_x, pos_y):
-        self.rect = pygame.Rect(pos_x - 25, pos_y - 25, 50, 50)
-        self.bateria = 100
-        self.ligado = False
-        self.cor = (100, 100, 100)
-
-    def ligar(self):
-        if not self.ligado:
-            self.ligado = True
-            return "Robô ligado!"
-        return "Robô já estava ligado."
-
-    def desligar(self):
-        if self.ligado:
-            self.ligado = False
-            return "Robô desligado."
-        return "Robô já estava desligado."
-
-    def aspirar(self):
-        if self.ligado and self.bateria > 0:
-            self.bateria -= 10
-            return f"Aspirando... Bateria: {self.bateria}%"
-        elif not self.ligado:
-            return "Não posso aspirar desligado."
-        else:
-            return "Bateria esgotada."
-
-    def desenhar(self, tela):
-        tela.blit(icon_robo, (self.rect.x, self.rect.y))
-        cor_status = (0, 255, 0) if self.ligado else (200, 0, 0)
-        pygame.draw.circle(tela, cor_status, (self.rect.centerx, self.rect.centery - 15), 7)
-        pygame.draw.rect(tela, (50, 50, 50), (self.rect.left, self.rect.bottom + 5, 50, 10))
-        pygame.draw.rect(tela, (0, 255, 0), (self.rect.left, self.rect.bottom + 5, self.bateria / 2, 10))
-
-class SmartLamp:
-    def __init__(self, pos_x, pos_y):
-        self.rect = pygame.Rect(pos_x - 25, pos_y - 25, 50, 50)
-        self.ligado = False
-        self.cor = (200, 200, 0)
-
-    def ligar(self):
-        self.ligado = True
-        return "Lâmpada acesa."
-
-    def desligar(self):
-        self.ligado = False
-        return "Lâmpada apagada."
-
-    def desenhar(self, tela):
-        tela.blit(icon_lamp, (self.rect.x, self.rect.y))
-        if self.ligado:
-            pygame.draw.circle(tela, (255, 255, 100, 80), self.rect.center, 30, width=0)
-
-class SmartSpeaker:
-    def __init__(self, pos_x, pos_y):
-        self.rect = pygame.Rect(pos_x - 25, pos_y - 25, 50, 50)
-        self.ligado = False
-        self.tocando_musica = False
-        self.cor = (0, 100, 200)
-
-    def ligar(self):
-        self.ligado = True
-        return "Speaker pronto."
-
-    def desligar(self):
-        self.ligado = False
-        self.tocando_musica = False
-        return "Speaker desligado."
-
-    def tocar_musica(self):
-        if self.ligado:
-            self.tocando_musica = True
-            return "Tocando música."
-        return "Speaker desligado."
-
-    def desenhar(self, tela):
-        tela.blit(icon_speaker, (self.rect.x, self.rect.y))
-        if self.tocando_musica:
-            pygame.draw.arc(tela, (0, 255, 255), self.rect.inflate(20, 20), 0, 3.14, 3)
+from const import ALTURA, AZUL_ATIVO, BRANCO, CINZA, LARGURA, PRETO, VERDE, ASSETS_PATH
+from model.Project import Project
+from model.Smart_Lamp import Smart_Lamp
+from model.Smart_Speaker import Smart_Speaker
+from model.Robot_Vacuum import Robot_Vacuum
 
 # --- INICIALIZAÇÃO DO PYGAME ---
 pygame.init()
-LARGURA, ALTURA = 1200, 750
-BRANCO = (255, 255, 255)
-PRETO = (0, 0, 0)
-CINZA = (200, 200, 200)
-AZUL_ATIVO = (100, 100, 255)
+
 tela = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Fase 2: O Laboratório de POO (Corrigido)")
+pygame.display.set_caption("SintaxSA")
 
 # --- CARREGAMENTO DE ASSETS ---
-ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
 icon_dev = pygame.image.load(os.path.join(ASSETS_PATH, "dev_icon.png"))
-icon_robo = pygame.image.load(os.path.join(ASSETS_PATH, "robot_vacuum_icon.png"))
-icon_lamp = pygame.image.load(os.path.join(ASSETS_PATH, "smart_lamp_icon.png"))
-icon_speaker = pygame.image.load(os.path.join(ASSETS_PATH, "smart_speaker_icon.png"))
+icon_speaker = Smart_Speaker.icon
+icon_lamp = Smart_Lamp.icon
+icon_robo = Robot_Vacuum.icon
 icon_dev = pygame.transform.smoothscale(icon_dev, (60, 60))
 icon_robo = pygame.transform.smoothscale(icon_robo, (50, 50))
 icon_lamp = pygame.transform.smoothscale(icon_lamp, (50, 50))
 icon_speaker = pygame.transform.smoothscale(icon_speaker, (50, 50))
 
 # --- PROJETOS/FASES ---
-projetos = [
-    {
-        "nome": "Eletrodomésticos Inteligentes",
-        "descricao": "Construa classes para RoboAspirador, SmartLamp e SmartSpeaker usando POO.",
-        "icone": icon_robo
-    },
-    {
-        "nome": "Sistema de Controle de Portas",
-        "descricao": "Implemente classes para portas automáticas, com métodos abrir, fechar e trancar.",
-        "icone": icon_lamp
-    }
-]
+projetos = Project.load_projects()
 projeto_selecionado = None
 atribuindo_dev = True
 
@@ -137,20 +44,20 @@ intro = True
 desafios = {
     1: {
         "nome": "Desafio 1: Encapsulamento",
-        "objetivo": "Crie a classe RoboAspirador com atributo 'bateria' e métodos 'ligar', 'desligar', 'aspirar'.",
-        "classe_alvo": "RoboAspirador",
+        "objetivo": "Crie a classe robot_vacuum com atributo 'bateria' e métodos 'ligar', 'desligar', 'aspirar'.",
+        "classe_alvo": "Robot_Vacuum",
         "atributos_req": {'bateria'},
         "metodos_req": {'ligar', 'desligar', 'aspirar'}
     },
     2: {
         "nome": "Desafio 2: Polimorfismo",
-        "objetivo": "Crie SmartLamp (ligar, desligar) e SmartSpeaker (ligar, desligar, tocar_musica).",
-        "classes_alvo": ["SmartLamp", "SmartSpeaker"],
+        "objetivo": "Crie SmartLamp (ligar, desligar) e Smart_Speaker (ligar, desligar, tocar_musica).",
+        "classes_alvo": ["Smart_Lamp", "Smart_Speaker"],
     }
 }
 requisitos_desafio2 = {
     "SmartLamp": {"metodos_req": {'ligar', 'desligar'}},
-    "SmartSpeaker": {"metodos_req": {'ligar', 'desligar', 'tocar_musica'}}
+    "Smart_Speaker": {"metodos_req": {'ligar', 'desligar', 'tocar_musica'}}
 }
 desafios_portas = {
     1: {
@@ -177,10 +84,10 @@ botao_ativar_todos = pygame.Rect(1020, 650, 150, 50)
 
 # --- EXPLICAÇÃO SOBRE HERANÇA ---
 explicacao_eletro = [
-    "Antes de criarmos o RoboAspirador, vamos entender o conceito de herança.",
+    "Antes de criarmos o robot_vacuum, vamos entender o conceito de herança.",
     "Imagine uma classe mãe chamada 'Eletrodomestico'.",
     "Ela pode ligar, desligar e conectar na energia.",
-    "RoboAspirador, SmartLamp e SmartSpeaker são eletrodomésticos,",
+    "robot_vacuum, SmartLamp e Smart_Speaker são eletrodomésticos,",
     "ou seja, herdam comportamentos básicos dessa classe mãe.",
     "",
     "Pressione qualquer tecla para continuar."
@@ -270,17 +177,17 @@ def tela_atribuicao_projeto():
         pygame.draw.rect(tela, (80, 80, 120), rect, 3, border_radius=18)
 
         # Ícone centralizado no topo do card
-        icon = projeto["icone"]
+        icon = projeto.icon
         icon_rect = icon.get_rect(center=(rect.centerx, rect.y + 45))
         tela.blit(icon, icon_rect)
 
         # Nome do projeto
-        nome = fonte_titulo.render(projeto["nome"], True, (40, 40, 60))
+        nome = fonte_titulo.render(projeto.nome, True, (40, 40, 60))
         nome_rect = nome.get_rect(center=(rect.centerx, rect.y + 100))
         tela.blit(nome, nome_rect)
 
         # Descrição com quebra de linha real
-        desc = projeto["descricao"]
+        desc = projeto.description
         desc_lines = wrap_text(desc, fonte_feedback, card_w - 40)
         for j, line in enumerate(desc_lines):
             desc_render = fonte_feedback.render(line, True, (60, 60, 80))
@@ -388,8 +295,8 @@ while True:
                             if (classe_em_construcao['nome'] == req['classe_alvo'] and
                                     classe_em_construcao['atributos'] == req['atributos_req'] and
                                     classe_em_construcao['metodos'] == req['metodos_req']):
-                                feedback_msg = "RoboAspirador definido com sucesso! Agora instancie."
-                                classes_definidas['RoboAspirador'] = True
+                                feedback_msg = "robot_vacuum definido com sucesso! Agora instancie."
+                                classes_definidas['robot_vacuum'] = True
                             else:
                                 feedback_msg = "Requisitos não atendidos. Verifique a planta."
                         elif desafio_atual == 2:
@@ -417,16 +324,16 @@ while True:
                     if classes_definidas.get(nome_para_instanciar):
                         pos_x = random.randint(820, 1150)
                         pos_y = random.randint(100, 500)
-                        if nome_para_instanciar == "RoboAspirador":
-                            objetos_instanciados.append(RoboAspirador(pos_x, pos_y))
-                            feedback_msg = "RoboAspirador instanciado!"
-                        elif nome_para_instanciado == "SmartLamp":
-                            objetos_instanciados.append(SmartLamp(pos_x, pos_y))
+                        if nome_para_instanciar == "robot_vacuum":
+                            objetos_instanciados.append(Robot_Vacuum(False, (100, 100, 100), pos_x, pos_y, 100))
+                            feedback_msg = "robot_vacuum instanciado!"
+                        elif nome_para_instanciar == "smart_lamp":
+                            objetos_instanciados.append(Smart_Lamp(pos_x, pos_y))
                             feedback_msg = "SmartLamp instanciada!"
-                        elif nome_para_instanciado == "SmartSpeaker":
-                            objetos_instanciados.append(SmartSpeaker(pos_x, pos_y))
-                            feedback_msg = "SmartSpeaker instanciado!"
-                        elif nome_para_instanciado == "Porta":
+                        elif nome_para_instanciar == "Smart_Speaker":
+                            objetos_instanciados.append(Smart_Speaker(pos_x, pos_y))
+                            feedback_msg = "Smart_Speaker instanciado!"
+                        elif nome_para_instanciar == "Porta":
                             # Implemente a classe Porta se desejar
                             feedback_msg = "Porta instanciada!"
                     else:
@@ -459,8 +366,8 @@ while True:
                                 obj.ligar()
 
                 # Avança para próximo desafio/fase
-                if projeto_selecionado["nome"] == "Eletrodomésticos Inteligentes" and desafio_atual == 1 and classes_definidas.get("RoboAspirador") and any(
-                        isinstance(o, RoboAspirador) for o in objetos_instanciados):
+                if projeto_selecionado["nome"] == "Eletrodomésticos Inteligentes" and desafio_atual == 1 and classes_definidas.get("robot_vacuum") and any(
+                        isinstance(o, robot_vacuum) for o in objetos_instanciados):
                     desafio_atual = 2
                     feedback_msg = "Desafio 1 completo! Vamos para o próximo."
                     classe_em_construcao = {'nome': '', 'atributos': set(), 'metodos': set()}
@@ -528,7 +435,7 @@ while True:
     titulo_sandbox = fonte_titulo.render("Área de Testes", True, PRETO)
     tela.blit(titulo_sandbox, (900, 40))
     for obj in objetos_instanciados:
-        obj.desenhar(tela)
+        obj.draw(tela)
 
     pygame.draw.rect(tela, (0, 100, 150), botao_instanciar)
     tela.blit(fonte_texto.render("Instanciar", True, BRANCO), (botao_instanciar.x + 30, botao_instanciar.y + 10))
