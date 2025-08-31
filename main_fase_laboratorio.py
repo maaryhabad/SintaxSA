@@ -8,6 +8,7 @@ from model.Project import Project
 from model.Smart_Lamp import Smart_Lamp
 from model.Smart_Speaker import Smart_Speaker
 from model.Robot_Vacuum import Robot_Vacuum
+from model.Challenge import Challenge
 
 # --- INICIALIZAÇÃO DO PYGAME ---
 pygame.init()
@@ -21,9 +22,6 @@ icon_speaker = Smart_Speaker.icon
 icon_lamp = Smart_Lamp.icon
 icon_robo = Robot_Vacuum.icon
 icon_dev = pygame.transform.smoothscale(icon_dev, (60, 60))
-icon_robo = pygame.transform.smoothscale(icon_robo, (50, 50))
-icon_lamp = pygame.transform.smoothscale(icon_lamp, (50, 50))
-icon_speaker = pygame.transform.smoothscale(icon_speaker, (50, 50))
 
 # --- PROJETOS/FASES ---
 projetos = Project.load_projects()
@@ -41,20 +39,7 @@ objetos_instanciados = []
 intro = True
 
 # --- DESAFIOS ---
-desafios = {
-    1: {
-        "nome": "Desafio 1: Encapsulamento",
-        "objetivo": "Crie a classe robot_vacuum com atributo 'bateria' e métodos 'ligar', 'desligar', 'aspirar'.",
-        "classe_alvo": "Robot_Vacuum",
-        "atributos_req": {'bateria'},
-        "metodos_req": {'ligar', 'desligar', 'aspirar'}
-    },
-    2: {
-        "nome": "Desafio 2: Polimorfismo",
-        "objetivo": "Crie SmartLamp (ligar, desligar) e Smart_Speaker (ligar, desligar, tocar_musica).",
-        "classes_alvo": ["Smart_Lamp", "Smart_Speaker"],
-    }
-}
+desafios = Challenge.load_challenges()
 requisitos_desafio2 = {
     "SmartLamp": {"metodos_req": {'ligar', 'desligar'}},
     "Smart_Speaker": {"metodos_req": {'ligar', 'desligar', 'tocar_musica'}}

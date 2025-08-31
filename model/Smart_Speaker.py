@@ -1,6 +1,6 @@
 import os
 import pygame
-from model.Electronics import Electronics
+from model.Electronic import Electronics
 
 
 class Smart_Speaker(Electronics):
@@ -8,7 +8,7 @@ class Smart_Speaker(Electronics):
     try:
         icon_path = os.path.join(Electronics.assets_path, 'smart_speaker_icon.png')
         icon = pygame.image.load(icon_path)
-        
+        icon = pygame.transform.smoothscale(icon, (50, 50))
     except pygame.error:
         print("Erro ao carregar a imagem do Smart Speaker! Verifique o caminho.")
         icon = pygame.Surface((50, 50))

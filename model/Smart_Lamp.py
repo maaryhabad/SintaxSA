@@ -1,12 +1,13 @@
 import os
 import pygame
-from model.Electronics import Electronics
+from model.Electronic import Electronics
 
 
 class Smart_Lamp(Electronics):
     try:
         icon_path = os.path.join(Electronics.assets_path, 'smart_lamp_icon.png')
         icon = pygame.image.load(icon_path)
+        icon = pygame.transform.smoothscale(icon, (50, 50))
     except pygame.error:
         print("Erro ao carregar a imagem da Smart Lamp! Verifique o caminho.")
         icon = pygame.Surface((50, 50))
