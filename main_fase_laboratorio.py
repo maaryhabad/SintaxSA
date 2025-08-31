@@ -178,7 +178,8 @@ def tela_atribuicao_projeto():
 
         # Ícone centralizado no topo do card
         icon = projeto.icon
-        icon_rect = icon.get_rect(center=(rect.centerx, rect.y + 45))
+        # Centraliza o ícone a 1/4 da altura do card, mantendo-o na parte de cima
+        icon_rect = icon.get_rect(center=(rect.centerx, rect.y + rect.height * 0.25))
         tela.blit(icon, icon_rect)
 
         # Nome do projeto
