@@ -105,8 +105,8 @@ class SmartSpeaker:
 
 # --- INICIALIZAÇÃO E CONFIGURAÇÕES GERAIS ---
 pygame.init()
-LARGURA, ALTURA = 1280, 800
-screen = pygame.display.set_mode((LARGURA, ALTURA))
+WIDTH, HEIGHT = 1280, 800
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("DevLife: Terminal Moderno")
 # --- PALETA DE CORES E FONTES ---
 BG_CARBON = (20, 22, 25);
@@ -276,7 +276,7 @@ while running:
                 if button_instantiate.collidepoint(mouse_pos):
                     name_to_instantiate = class_in_construction['name']
                     if classes_defined.get(name_to_instantiate):
-                        pos_x, pos_y = random.randint(500, LARGURA - 100), random.randint(150, ALTURA - 150)
+                        pos_x, pos_y = random.randint(500, WIDTH - 100), random.randint(150, HEIGHT - 150)
                         if name_to_instantiate == "RoboAspirador":
                             instantiated_objects.append(RoboAspirador(pos_x, pos_y))
                             # --- ALTERAÇÃO: Lógica de transição foi removida daqui ---
@@ -325,14 +325,14 @@ while running:
     screen.fill(BG_CARBON)
     if fase_atual == 'HERANCA':
         # ... (renderização da fase de herança inalterada)
-        draw_panel(screen, (20, 20, 450, ALTURA - 80), PANEL_DARK, BORDER_LIGHT)
+        draw_panel(screen, (20, 20, 450, HEIGHT - 80), PANEL_DARK, BORDER_LIGHT)
         draw_text(screen, "Fase 1: Herança", font_ui_bold, TEXT_LIGHT, (245, 60))
         draw_text(screen, "O projeto SmartHome precisa de um especialista.", font_ui, TEXT_LIGHT, (245, 100))
         draw_button_styled(screen, button_especializar_iot, "Definir Subclasse: DevIoT", font_code, ACCENT_BLUE,
                            ACCENT_BLUE_HOVER, TEXT_LIGHT, is_enabled=not dev_iot_desbloqueado)
         if dev_iot_desbloqueado: draw_button_styled(screen, button_contratar_iot, "Contratar DevIoT", font_ui_bold,
                                                     ACCENT_IOT, ACCENT_IOT_HOVER, TEXT_LIGHT)
-        draw_panel(screen, (50, 360, 400, ALTURA - 460), BG_CARBON, BORDER_LIGHT)
+        draw_panel(screen, (50, 360, 400, HEIGHT - 460), BG_CARBON, BORDER_LIGHT)
         draw_text(screen, "Equipa:", font_ui_bold, TEXT_LIGHT, (100, 390))
         for dev in devs_contratados: dev.draw(screen)
         draw_panel(screen, tarefa_smarthome['rect'], PANEL_DARK, BORDER_LIGHT)
@@ -342,11 +342,11 @@ while running:
     elif fase_atual == 'LABORATORIO':
         # ... (renderização da fase de laboratório, com uma adição)
         challenge_info = lab_challenges[desafio_lab_actual]
-        draw_panel(screen, (20, 20, LARGURA - 40, 80), PANEL_DARK, BORDER_LIGHT)
+        draw_panel(screen, (20, 20, WIDTH - 40, 80), PANEL_DARK, BORDER_LIGHT)
         draw_text(screen, f"Fase 2: Laboratório - {challenge_info['name']}", font_ui_bold, TEXT_LIGHT,
-                  ((LARGURA - 40) / 2, 45))
-        draw_text(screen, challenge_info['objective'], font_ui, TEXT_LIGHT, ((LARGURA - 40) / 2, 75))
-        draw_panel(screen, (20, 120, 420, ALTURA - 180), PANEL_DARK, BORDER_LIGHT)
+                  ((WIDTH - 40) / 2, 45))
+        draw_text(screen, challenge_info['objective'], font_ui, TEXT_LIGHT, ((WIDTH - 40) / 2, 75))
+        draw_panel(screen, (20, 120, 420, HEIGHT - 180), PANEL_DARK, BORDER_LIGHT)
         draw_text(screen, "Mesa de Trabalho", font_ui_bold, TEXT_LIGHT, (230, 150))
         border_color = INPUT_ACTIVE_AMBER if input_box_active else BORDER_LIGHT
         draw_panel(screen, input_box_name, BG_CARBON, border_color)
@@ -372,8 +372,8 @@ while running:
             draw_button_styled(screen, button_validate_class, "Validar Planta da Classe", font_ui_bold, ACCENT_GREEN,
                                ACCENT_GREEN_HOVER, TEXT_DARK)
 
-        draw_panel(screen, (460, 120, LARGURA - 480, ALTURA - 180), BG_CARBON, BORDER_LIGHT)
-        draw_text(screen, "Área de Testes (Sandbox)", font_ui_bold, TEXT_LIGHT, (460 + (LARGURA - 480) / 2, 150))
+        draw_panel(screen, (460, 120, WIDTH - 480, HEIGHT - 180), BG_CARBON, BORDER_LIGHT)
+        draw_text(screen, "Área de Testes (Sandbox)", font_ui_bold, TEXT_LIGHT, (460 + (WIDTH - 480) / 2, 150))
         for obj in instantiated_objects: obj.draw(screen, font_code_small)
         draw_button_styled(screen, button_instantiate, "Instanciar", font_ui_bold, ACCENT_BLUE, ACCENT_BLUE_HOVER,
                            TEXT_LIGHT, is_enabled=(class_in_construction['name'] in classes_defined))
@@ -382,7 +382,7 @@ while running:
                                TEXT_LIGHT,
                                is_enabled=(classes_defined.get('SmartLamp') and classes_defined.get('SmartSpeaker')))
 
-    draw_text(screen, feedback_msg, font_ui, TEXT_LIGHT, (LARGURA / 2, ALTURA - 30))
+    draw_text(screen, feedback_msg, font_ui, TEXT_LIGHT, (WIDTH / 2, HEIGHT - 30))
     pygame.display.flip()
 
 pygame.quit()

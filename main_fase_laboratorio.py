@@ -3,7 +3,8 @@ import pygame
 import sys
 import random
 import os
-from const import ALTURA, AZUL_ATIVO, BRANCO, CINZA, LARGURA, PRETO, VERDE, ASSETS_PATH
+from const import HEIGHT, ACTIVE_BLUE, WHITE, GREY, WIDTH, BLACK, GREEN, ASSETS_PATH, EXPLICACAO_ELETRO
+from model import Developer
 from model.Project import Project
 from model.Smart_Lamp import Smart_Lamp
 from model.Smart_Speaker import Smart_Speaker
@@ -13,7 +14,7 @@ from model.Challenge import Challenge
 # --- INICIALIZAÇÃO DO PYGAME ---
 pygame.init()
 
-tela = pygame.display.set_mode((LARGURA, ALTURA))
+tela = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SintaxSA")
 
 # --- CARREGAMENTO DE ASSETS ---
@@ -29,14 +30,7 @@ projeto_selecionado = None
 atribuindo_dev = True
 
 # --- CONTROLE DE ESTADO DO JOGO ---
-desafio_atual = 1
-feedback_msg = "Bem-vindo ao Laboratório!"
-classe_em_construcao = {'nome': '', 'atributos': set(), 'metodos': set()}
-classes_definidas = {}
-input_box_active = False
-nome_classe_input = ""
-objetos_instanciados = []
-intro = True
+Challenge.load_challenges()
 
 # --- DESAFIOS ---
 desafios = Challenge.load_challenges()
@@ -67,24 +61,10 @@ botao_validar_classe = pygame.Rect(50, 500, 280, 50)
 botao_instanciar = pygame.Rect(850, 650, 150, 50)
 botao_ativar_todos = pygame.Rect(1020, 650, 150, 50)
 
-# --- EXPLICAÇÃO SOBRE HERANÇA ---
-explicacao_eletro = [
-    "Antes de criarmos o robot_vacuum, vamos entender o conceito de herança.",
-    "Imagine uma classe mãe chamada 'Eletrodomestico'.",
-    "Ela pode ligar, desligar e conectar na energia.",
-    "robot_vacuum, SmartLamp e Smart_Speaker são eletrodomésticos,",
-    "ou seja, herdam comportamentos básicos dessa classe mãe.",
-    "",
-    "Pressione qualquer tecla para continuar."
-]
+
 
 # --- SELEÇÃO DE DESENVOLVEDORES ---
-devs_disponiveis = [
-    {"nome": "Ana", "cor": (255, 100, 100), "nivel": "Júnior", "descricao": "Recebe dicas visuais e feedback detalhado."},
-    {"nome": "Bruno", "cor": (100, 255, 100), "nivel": "Pleno", "descricao": "Recebe algumas dicas e feedback moderado."},
-    {"nome": "Carla", "cor": (100, 100, 255), "nivel": "Sênior", "descricao": "Sem dicas, apenas o escopo do desafio."},
-    {"nome": "Diego", "cor": (255, 200, 50), "nivel": "Sênior", "descricao": "Sem dicas, desafios extras aparecem."}
-]
+devs_disponiveis = Developer.load_developers()
 dev_selecionado = None
 selecionando_dev = False
 nivel_dev = None
@@ -92,7 +72,6 @@ nivel_dev = None
 # --- FONTES ---
 FONTS_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts")
 press_start_path = os.path.join(FONTS_PATH, "PressStart2P-Regular.ttf")
-
 fonte_titulo = pygame.font.Font(press_start_path, 24)
 fonte_texto = pygame.font.Font(press_start_path, 14)
 fonte_feedback = pygame.font.Font(press_start_path, 10)
@@ -117,18 +96,18 @@ def wrap_text(text, font, max_width):
 def tela_selecao_dev():
     tela.fill((230, 230, 255))
     titulo = fonte_titulo.render("Selecione um(a) dev para o laboratório!", True, (30, 30, 30))
-    tela.blit(titulo, (LARGURA // 2 - titulo.get_width() // 2, 80))
+    tela.blit(titulo, (WIDTH // 2 - titulo.get_width() // 2, 80))
     x = 120
     y = 250
     botoes = []
     for dev in devs_disponiveis:
         rect = pygame.Rect(x, y, 220, 140)
         pygame.draw.rect(tela, dev["cor"], rect, border_radius=15)
-        pygame.draw.rect(tela, PRETO, rect, 2, border_radius=15)
+        pygame.draw.rect(tela, BLACK, rect, 2, border_radius=15)
         tela.blit(icon_dev, (rect.x + 10, rect.y + 20))
-        nome = fonte_titulo.render(dev["nome"], True, PRETO)
-        nivel = fonte_texto.render(f"Nível: {dev['nivel']}", True, PRETO)
-        desc = fonte_feedback.render(dev["descricao"], True, PRETO)
+        nome = fonte_titulo.render(dev["nome"], True, BLACK)
+        nivel = fonte_texto.render(f"Nível: {dev['nivel']}", True, BLACK)
+        desc = fonte_feedback.render(dev["descricao"], True, BLACK)
         tela.blit(nome, (rect.x + 80, rect.y + 15))
         tela.blit(nivel, (rect.x + 80, rect.y + 50))
         tela.blit(desc, (rect.x + 10, rect.y + 90))
@@ -140,13 +119,13 @@ def tela_selecao_dev():
 def tela_atribuicao_projeto():
     tela.fill((227, 240, 255))  # Azul claro
     titulo = fonte_titulo.render("Atribua um(a) dev a um projeto!", True, (30, 30, 30))
-    tela.blit(titulo, (LARGURA // 2 - titulo.get_width() // 2, 60))
+    tela.blit(titulo, (WIDTH // 2 - titulo.get_width() // 2, 60))
 
     card_w, card_h = 320, 170
     card_y = 250
     espacamento = 60
     total_w = len(projetos) * card_w + (len(projetos) - 1) * espacamento
-    start_x = (LARGURA - total_w) // 2
+    start_x = (WIDTH - total_w) // 2
 
     botoes = []
     for i, projeto in enumerate(projetos):
@@ -163,7 +142,7 @@ def tela_atribuicao_projeto():
 
         # Ícone centralizado no topo do card
         icon = projeto.icon
-        # Centraliza o ícone a 1/4 da altura do card, mantendo-o na parte de cima
+        # Centraliza o ícone a 1/4 da HEIGHT do card, mantendo-o na parte de cima
         icon_rect = icon.get_rect(center=(rect.centerx, rect.y + rect.height * 0.25))
         tela.blit(icon, icon_rect)
 
@@ -229,10 +208,10 @@ while True:
         tela.fill((245, 245, 245))
         y = 150
         titulo = fonte_titulo.render("Herança e Classe Mãe: Eletrodomestico", True, (0, 0, 0))
-        tela.blit(titulo, (LARGURA // 2 - titulo.get_width() // 2, 80))
-        for linha in explicacao_eletro:
+        tela.blit(titulo, (WIDTH // 2 - titulo.get_width() // 2, 80))
+        for linha in EXPLICACAO_ELETRO:
             texto = fonte_texto.render(linha, True, (0, 0, 0))
-            tela.blit(texto, (LARGURA // 2 - texto.get_width() // 2, y))
+            tela.blit(texto, (WIDTH // 2 - texto.get_width() // 2, y))
             y += 40
         pygame.display.flip()
         for evento in pygame.event.get():
@@ -367,13 +346,13 @@ while True:
     tela.fill((245, 245, 245))
 
     # Painel do Desafio
-    pygame.draw.rect(tela, CINZA, (20, 20, 750, 80))
+    pygame.draw.rect(tela, GREY, (20, 20, 750, 80))
     if projeto_selecionado:
         if projeto_selecionado["nome"] == "Eletrodomésticos Inteligentes":
             desafio_info = desafios[desafio_atual]
         else:
             desafio_info = desafios_portas[1]
-        titulo_desafio = fonte_texto.render(desafio_info['nome'], True, PRETO)
+        titulo_desafio = fonte_texto.render(desafio_info['nome'], True, BLACK)
         objetivo_desafio = fonte_feedback.render(desafio_info['objetivo'], True, (50, 50, 50))
         tela.blit(titulo_desafio, (30, 30))
         tela.blit(objetivo_desafio, (30, 60))
@@ -387,59 +366,59 @@ while True:
         tela.blit(fonte_feedback.render(dica, True, (0, 120, 0)), (30, 85))
 
     # Mesa de Trabalho (Class Builder)
-    pygame.draw.line(tela, PRETO, (400, 120), (400, 720), 2)
-    titulo_builder = fonte_titulo.render("Mesa de Trabalho", True, PRETO)
+    pygame.draw.line(tela, BLACK, (400, 120), (400, 720), 2)
+    titulo_builder = fonte_titulo.render("Mesa de Trabalho", True, BLACK)
     tela.blit(titulo_builder, (50, 110))
-    cor_da_borda = AZUL_ATIVO if input_box_active else PRETO
-    pygame.draw.rect(tela, BRANCO, input_box_nome)
+    cor_da_borda = ACTIVE_BLUE if input_box_active else BLACK
+    pygame.draw.rect(tela, WHITE, input_box_nome)
     pygame.draw.rect(tela, cor_da_borda, input_box_nome, 2)
-    texto_input = fonte_texto.render(nome_classe_input, True, PRETO)
+    texto_input = fonte_texto.render(nome_classe_input, True, BLACK)
     tela.blit(texto_input, (input_box_nome.x + 10, input_box_nome.y + 5))
 
-    tela.blit(fonte_texto.render("Atributos:", True, PRETO), (50, 210))
+    tela.blit(fonte_texto.render("Atributos:", True, BLACK), (50, 210))
     for nome, rect in paleta_atributos.items():
         selecionado = nome in classe_em_construcao['atributos']
-        cor = VERDE if selecionado else BRANCO
+        cor = GREEN if selecionado else WHITE
         pygame.draw.rect(tela, cor, rect)
-        pygame.draw.rect(tela, PRETO, rect, 1)
-        tela.blit(fonte_feedback.render(nome, True, PRETO), (rect.x + 10, rect.y + 8))
+        pygame.draw.rect(tela, BLACK, rect, 1)
+        tela.blit(fonte_feedback.render(nome, True, BLACK), (rect.x + 10, rect.y + 8))
 
-    tela.blit(fonte_texto.render("Métodos:", True, PRETO), (200, 210))
+    tela.blit(fonte_texto.render("Métodos:", True, BLACK), (200, 210))
     for nome, rect in paleta_metodos.items():
         selecionado = nome in classe_em_construcao['metodos']
-        cor = VERDE if selecionado else BRANCO
+        cor = GREEN if selecionado else WHITE
         pygame.draw.rect(tela, cor, rect)
-        pygame.draw.rect(tela, PRETO, rect, 1)
-        tela.blit(fonte_feedback.render(f"{nome}()", True, PRETO), (rect.x + 10, rect.y + 8))
+        pygame.draw.rect(tela, BLACK, rect, 1)
+        tela.blit(fonte_feedback.render(f"{nome}()", True, BLACK), (rect.x + 10, rect.y + 8))
 
     pygame.draw.rect(tela, (0, 150, 0), botao_validar_classe)
-    tela.blit(fonte_texto.render("Validar Classe", True, BRANCO),
+    tela.blit(fonte_texto.render("Validar Classe", True, WHITE),
               (botao_validar_classe.x + 70, botao_validar_classe.y + 10))
 
     # Área de Testes
-    pygame.draw.line(tela, PRETO, (800, 20), (800, 720), 2)
-    titulo_sandbox = fonte_titulo.render("Área de Testes", True, PRETO)
+    pygame.draw.line(tela, BLACK, (800, 20), (800, 720), 2)
+    titulo_sandbox = fonte_titulo.render("Área de Testes", True, BLACK)
     tela.blit(titulo_sandbox, (900, 40))
     for obj in objetos_instanciados:
         obj.draw(tela)
 
     pygame.draw.rect(tela, (0, 100, 150), botao_instanciar)
-    tela.blit(fonte_texto.render("Instanciar", True, BRANCO), (botao_instanciar.x + 30, botao_instanciar.y + 10))
+    tela.blit(fonte_texto.render("Instanciar", True, WHITE), (botao_instanciar.x + 30, botao_instanciar.y + 10))
     if projeto_selecionado and projeto_selecionado["nome"] == "Eletrodomésticos Inteligentes" and desafio_atual == 2:
         pygame.draw.rect(tela, (150, 0, 150), botao_ativar_todos)
-        tela.blit(fonte_texto.render("ATIVAR TUDO", True, BRANCO),
+        tela.blit(fonte_texto.render("ATIVAR TUDO", True, WHITE),
                   (botao_ativar_todos.x + 15, botao_ativar_todos.y + 10))
 
     # Painel de Feedback
-    pygame.draw.rect(tela, PRETO, (0, 720, LARGURA, 30))
-    feedback_render = fonte_feedback.render(feedback_msg, True, BRANCO)
+    pygame.draw.rect(tela, BLACK, (0, 720, WIDTH, 30))
+    feedback_render = fonte_feedback.render(feedback_msg, True, WHITE)
     tela.blit(feedback_render, (10, 725))
 
     # Renderização da explicação
     if intro:
         y_offset = 0
-        for linha in explicacao_eletro:
-            texto_explicacao = fonte_texto.render(linha, True, PRETO)
+        for linha in EXPLICACAO_ELETRO:
+            texto_explicacao = fonte_texto.render(linha, True, BLACK)
             tela.blit(texto_explicacao, (50, 100 + y_offset))
             y_offset += 30
 
@@ -451,7 +430,7 @@ while True:
         tela.blit(dev_desc, (820, 30))
     if projeto_selecionado:
         tela.blit(projeto_selecionado["icone"], (700, 5))
-        nome_proj = fonte_feedback.render(f"Projeto: {projeto_selecionado['nome']}", True, PRETO)
+        nome_proj = fonte_feedback.render(f"Projeto: {projeto_selecionado['nome']}", True, BLACK)
         tela.blit(nome_proj, (770, 10))
 
     pygame.display.flip()

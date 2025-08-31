@@ -14,8 +14,9 @@ class Challenge():
             class_goal="RobotVacuum",
             required_attributes={'battery'},
             required_methods=["turn_on", "turn_off", "vacuum"])
-            ], Challenge(
-            name="Desafio 2: Polimorfismo",
-            goal="Crie a classe SmartLamp (power_on, power_off) e SmartSpeaker (power_on, power_off, play_music).)",
-            class_goal=["SmartLamp", "SmartSpeaker"],
-            )
+            # , Challenge(
+            # name="Desafio 2: Polimorfismo",
+            # goal="Crie a classe SmartLamp (power_on, power_off) e SmartSpeaker (power_on, power_off, play_music).)",
+            # class_goal=["SmartLamp", "SmartSpeaker"],
+            # )
+            ]

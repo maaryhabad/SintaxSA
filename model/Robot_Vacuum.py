@@ -1,11 +1,11 @@
-from model.Electronic import Electronics
+from model.Electronic import Electronic
 import pygame
 import os
 
 
-class Robot_Vacuum(Electronics):
+class Robot_Vacuum(Electronic):
     try:
-        icon_path = os.path.join(Electronics.assets_path, 'robot_vacuum_icon.png')
+        icon_path = os.path.join(Electronic.assets_path, 'robot_vacuum_icon.png')
         icon = pygame.image.load(icon_path)
         icon = pygame.transform.smoothscale(icon, (50, 50))
     except pygame.error:

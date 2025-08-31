@@ -1,11 +1,11 @@
 import os
 import pygame
-from model.Electronic import Electronics
+from model.Electronic import Electronic
 
 
-class Smart_Lamp(Electronics):
+class Smart_Lamp(Electronic):
     try:
-        icon_path = os.path.join(Electronics.assets_path, 'smart_lamp_icon.png')
+        icon_path = os.path.join(Electronic.assets_path, 'smart_lamp_icon.png')
         icon = pygame.image.load(icon_path)
         icon = pygame.transform.smoothscale(icon, (50, 50))
     except pygame.error:
