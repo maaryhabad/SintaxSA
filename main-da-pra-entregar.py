@@ -324,7 +324,6 @@ while running:
     # --- RENDERIZAÇÃO ---
     screen.fill(BG_CARBON)
     if fase_atual == 'HERANCA':
-        # ... (renderização da fase de herança inalterada)
         draw_panel(screen, (20, 20, 450, HEIGHT - 80), PANEL_DARK, BORDER_LIGHT)
         draw_text(screen, "Fase 1: Herança", font_ui_bold, TEXT_LIGHT, (245, 60))
         draw_text(screen, "O projeto SmartHome precisa de um especialista.", font_ui, TEXT_LIGHT, (245, 100))
@@ -333,7 +332,7 @@ while running:
         if dev_iot_desbloqueado: draw_button_styled(screen, button_contratar_iot, "Contratar DevIoT", font_ui_bold,
                                                     ACCENT_IOT, ACCENT_IOT_HOVER, TEXT_LIGHT)
         draw_panel(screen, (50, 360, 400, HEIGHT - 460), BG_CARBON, BORDER_LIGHT)
-        draw_text(screen, "Equipa:", font_ui_bold, TEXT_LIGHT, (100, 390))
+        draw_text(screen, "Equipe:", font_ui_bold, TEXT_LIGHT, (100, 390))
         for dev in devs_contratados: dev.draw(screen)
         draw_panel(screen, tarefa_smarthome['rect'], PANEL_DARK, BORDER_LIGHT)
         draw_text(screen, "Projeto: Sistema SmartHome", font_ui_bold, TEXT_LIGHT, tarefa_smarthome['rect'].center)
